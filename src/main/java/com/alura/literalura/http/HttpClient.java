@@ -1,0 +1,22 @@
+package com.alura.literalura.http;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+public class HttpClient {
+
+    private String fazerRequisicao(String endereco) {
+        java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(endereco)).build();
+        HttpResponse<String> response = null;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        return response.body();
+    }
+}
