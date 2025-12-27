@@ -1,15 +1,31 @@
 package com.alura.literalura.model;
 
+import jakarta.persistence.*;
+
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
+@Table(name = "livros")
 public class Livro {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String titulo;
     private Integer downloadCount;
+    @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> idiomas = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "livro_autor",
+            joinColumns = @JoinColumn(name = "livro_id"),
+            inverseJoinColumns = @JoinColumn(name = "autor_id")
+    )
     private Set<Autor> autores = new HashSet<>();
 
-    public Livro() {}
+    public Livro() {
+    }
 
     public Livro(String titulo, Integer downloadCount,
                  Set<String> idiomas, Set<Autor> autores) {
@@ -17,6 +33,10 @@ public class Livro {
         this.downloadCount = downloadCount;
         this.idiomas = idiomas;
         this.autores = autores;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getTitulo() {
@@ -57,6 +77,7 @@ public class Livro {
                 "titulo='" + titulo + '\'' +
                 ", downloadCount=" + downloadCount +
                 ", idiomas=" + idiomas +
+                ", autores=" + autores +
                 '}';
     }
 }

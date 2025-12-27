@@ -1,15 +1,25 @@
 package com.alura.literalura.model;
 
+import jakarta.persistence.*;
+
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
+@Table(name = "autores")
 public class Autor {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String nome;
     private Integer anoNascimento;
     private Integer anoFalecimento;
+
+    @ManyToMany(mappedBy = "autores", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Livro> livros = new HashSet<>();
 
-    public Autor() {}
+    public Autor() {
+    }
 
     public Autor(String nome, Integer anoNascimento,
                  Integer anoFalecimento, Set<Livro> livros) {
@@ -17,6 +27,10 @@ public class Autor {
         this.anoNascimento = anoNascimento;
         this.anoFalecimento = anoFalecimento;
         this.livros = livros;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getNome() {
@@ -57,6 +71,7 @@ public class Autor {
                 "nome='" + nome + '\'' +
                 ", anoNascimento=" + anoNascimento +
                 ", anoFalecimento=" + anoFalecimento +
+                ", livros=" + livros +
                 '}';
     }
 }
