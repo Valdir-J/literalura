@@ -1,5 +1,6 @@
 package com.alura.literalura;
 
+import com.alura.literalura.principal.Principal;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -19,6 +20,7 @@ public class LiteraluraApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("Hello Word");
+        Principal principal = new Principal();
+        principal.exibeMenu();
     }
 }
