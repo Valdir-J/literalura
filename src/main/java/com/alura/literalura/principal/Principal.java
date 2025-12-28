@@ -1,13 +1,27 @@
 package com.alura.literalura.principal;
 
 import com.alura.literalura.dto.AutorDTO;
+import com.alura.literalura.model.Autor;
+import com.alura.literalura.model.Livro;
+import com.alura.literalura.repository.AutorRepository;
+import com.alura.literalura.repository.LivroRepository;
 import com.alura.literalura.service.GutendexAPI;
+
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Principal {
     private final Scanner scanner = new Scanner(System.in);
     private final GutendexAPI gutendexApi = new GutendexAPI();
+    private final LivroRepository livroRepository;
+    private final AutorRepository autorRepository;
+
+    public Principal(LivroRepository livroRepository, AutorRepository autorRepository) {
+        this.livroRepository = livroRepository;
+        this.autorRepository = autorRepository;
+    }
 
     public void exibeMenu() {
         int opcao = -1;
@@ -42,21 +56,59 @@ public class Principal {
         System.out.println("Insira o nome do livro que você deseja procurar");
         var tituloLivro = scanner.nextLine().trim();
         var responseDTO = gutendexApi.buscarLivroPorTitulo(tituloLivro);
-        var primeiroLivro = responseDTO.livros().getFirst();
 
-        var autoresDoLivro = primeiroLivro.autores().stream()
-                .map(AutorDTO::nome)
+        // Verifica se a lista de livros está vazia
+        if (responseDTO.livros().isEmpty()) {
+            System.out.println("Livro não encontrado.");
+            return;
+        }
+
+        // Pega somente o primeiro livro
+        var primeiroLivroDTO = responseDTO.livros().getFirst();
+
+        // Verifica se o livro já existe no banco para não duplicar
+        if (livroRepository.existsByTitulo(primeiroLivroDTO.titulo())) {
+            System.out.println("O livro já está cadastrado no banco de dados.");
+            return;
+        }
+
+        Livro livro = new Livro();
+        livro.setTitulo(primeiroLivroDTO.titulo());
+        livro.setDownloadCount(primeiroLivroDTO.numeroDownloads());
+        livro.setIdiomas(new HashSet<>(primeiroLivroDTO.idiomas()));
+
+        Set<Autor> autores = new HashSet<>();
+        for (AutorDTO autorDTO : primeiroLivroDTO.autores()) {
+            Autor autor = autorRepository.findByNome(autorDTO.nome());
+
+            if (autor == null) {
+                // Se não existir, cria um novo
+                autor = new Autor();
+                autor.setNome(autorDTO.nome());
+                autor.setAnoNascimento(autorDTO.anoNascimento());
+                autor.setAnoFalecimento(autorDTO.anoFalecimento());
+            }
+            autores.add(autor);
+        }
+        livro.setAutores(autores);
+
+        livroRepository.save(livro);
+
+        exibirDetalhesLivro(livro);
+    }
+
+    private void exibirDetalhesLivro(Livro livro) {
+        String autoresNomes = livro.getAutores().stream()
+                .map(Autor::getNome)
                 .collect(Collectors.joining(", "));
-        var idiomas = String.join(", ", primeiroLivro.idiomas());
-
-
+        String idiomas = String.join(", ", livro.getIdiomas());
         System.out.printf("""
-                ---- LIVRO -----
+                ----- LIVRO -----
                 Título: %s
                 Autor: %s
                 Idioma: %s
                 Número de downloads: %d
-                ----------------
-                """, primeiroLivro.titulo(), autoresDoLivro, idiomas, primeiroLivro.numeroDownloads());
+                -----------------
+                """, livro.getTitulo(), autoresNomes, idiomas, livro.getDownloadCount());
     }
 }
