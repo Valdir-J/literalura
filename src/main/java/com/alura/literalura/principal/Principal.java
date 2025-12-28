@@ -34,6 +34,7 @@ public class Principal {
                 3 - listar autores registrados
                 4 - listar autores vivos em um determinado ano
                 5 - listar livros em um determinado idioma
+                6 - listar top 10 livros mais baixados
                 
                 0 - Sair
                 ------------------------------
@@ -59,6 +60,9 @@ public class Principal {
                     break;
                 case 5:
                     listarLivrosPorIdioma();
+                    break;
+                case 6:
+                    listarTop10LivrosMaisBaixado();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -203,6 +207,18 @@ public class Principal {
             return;
         }
         System.out.println("Livros no idioma " + idioma + ":");
+        livros.forEach(this::exibirDetalhesLivro);
+    }
+
+    public void listarTop10LivrosMaisBaixado() {
+        List<Livro> livros = livroRepository.buscarTop10LivrosMaisBaixados();
+
+        if (livros.isEmpty()) {
+            System.out.println("Nenhum livro encontrado.");
+            return;
+        }
+
+        System.out.println("Top 10 livros mais baixados:");
         livros.forEach(this::exibirDetalhesLivro);
     }
 }
