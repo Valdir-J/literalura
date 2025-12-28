@@ -31,6 +31,7 @@ public class Principal {
                 Escolha o número da opção:
                 1 - Buscar livro pelo título
                 2 - listar livros registrados
+                3 - listar autores registrados
                 
                 0 - Sair
                 ------------------------------
@@ -47,6 +48,9 @@ public class Principal {
                     break;
                 case 2:
                     listarLivrosRegistrados();
+                    break;
+                case 3:
+                    listarAutoresRegistrados();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -127,5 +131,34 @@ public class Principal {
 
         System.out.println("Livros registrados:");
         livros.forEach(this::exibirDetalhesLivro);
+    }
+
+
+    private void listarAutoresRegistrados() {
+        List<Autor> autores = autorRepository.findAll();
+
+        if (autores.isEmpty()) {
+            System.out.println("Nenhum autor registrado.");
+            return;
+        }
+
+        System.out.println("Autores registrados:");
+        autores.forEach(this::exibirDetalhesAutor);
+    }
+    
+    private void exibirDetalhesAutor(Autor autor) {
+        String livrosAutor = autor.getLivros().stream()
+                .map(Livro::getTitulo)
+                .collect(Collectors.joining(", "));
+
+        System.out.printf("""
+                        \n----- AUTOR -----
+                        Autor: %s
+                        Ano de nascimento: %d
+                        Ano de falecimento: %d
+                        Livros: [%s]
+                        -----------------
+                        """, autor.getNome(), autor.getAnoNascimento()
+                , autor.getAnoFalecimento(), livrosAutor);
     }
 }
