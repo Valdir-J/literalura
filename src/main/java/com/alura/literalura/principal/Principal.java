@@ -32,6 +32,7 @@ public class Principal {
                 1 - Buscar livro pelo título
                 2 - listar livros registrados
                 3 - listar autores registrados
+                4 - listar autores vivos em um determinado ano
                 
                 0 - Sair
                 ------------------------------
@@ -51,6 +52,9 @@ public class Principal {
                     break;
                 case 3:
                     listarAutoresRegistrados();
+                    break;
+                case 4:
+                    listarAutoresVivosPorAno();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -133,7 +137,6 @@ public class Principal {
         livros.forEach(this::exibirDetalhesLivro);
     }
 
-
     private void listarAutoresRegistrados() {
         List<Autor> autores = autorRepository.findAll();
 
@@ -145,7 +148,7 @@ public class Principal {
         System.out.println("Autores registrados:");
         autores.forEach(this::exibirDetalhesAutor);
     }
-    
+
     private void exibirDetalhesAutor(Autor autor) {
         String livrosAutor = autor.getLivros().stream()
                 .map(Livro::getTitulo)
@@ -160,5 +163,21 @@ public class Principal {
                         -----------------
                         """, autor.getNome(), autor.getAnoNascimento()
                 , autor.getAnoFalecimento(), livrosAutor);
+    }
+
+    private void listarAutoresVivosPorAno() {
+        System.out.println("Insira o ano que deseja pesquisar");
+        var ano = scanner.nextInt();
+        scanner.nextLine();
+
+        List<Autor> autoresVivos = autorRepository.listarAutoresVivosNoAno(ano);
+
+        if (autoresVivos.isEmpty()) {
+            System.out.println("Nenhum autor vivo encontrado no ano especificado.");
+            return;
+        }
+
+        System.out.println("Autores vivos no ano " + ano + ":");
+        autoresVivos.forEach(this::exibirDetalhesAutor);
     }
 }
