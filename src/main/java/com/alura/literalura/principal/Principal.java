@@ -8,6 +8,7 @@ import com.alura.literalura.repository.LivroRepository;
 import com.alura.literalura.service.GutendexAPI;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ public class Principal {
                 \n------------------------------
                 Escolha o número da opção:
                 1 - Buscar livro pelo título
+                2 - listar livros registrados
                 
                 0 - Sair
                 ------------------------------
@@ -42,6 +44,9 @@ public class Principal {
             switch (opcao) {
                 case 1:
                     buscarLivroPorTitulo();
+                    break;
+                case 2:
+                    listarLivrosRegistrados();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -103,12 +108,24 @@ public class Principal {
                 .collect(Collectors.joining(", "));
         String idiomas = String.join(", ", livro.getIdiomas());
         System.out.printf("""
-                ----- LIVRO -----
+                \n----- LIVRO -----
                 Título: %s
                 Autor: %s
                 Idioma: %s
                 Número de downloads: %d
                 -----------------
                 """, livro.getTitulo(), autoresNomes, idiomas, livro.getDownloadCount());
+    }
+
+    private void listarLivrosRegistrados() {
+        List<Livro> livros = livroRepository.findAll();
+
+        if (livros.isEmpty()) {
+            System.out.println("Nenhum livro registrado.");
+            return;
+        }
+
+        System.out.println("Livros registrados:");
+        livros.forEach(this::exibirDetalhesLivro);
     }
 }
