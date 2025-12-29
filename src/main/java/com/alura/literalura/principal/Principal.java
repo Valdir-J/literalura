@@ -7,10 +7,7 @@ import com.alura.literalura.repository.AutorRepository;
 import com.alura.literalura.repository.LivroRepository;
 import com.alura.literalura.service.GutendexAPI;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Principal {
@@ -35,6 +32,7 @@ public class Principal {
                 4 - listar autores vivos em um determinado ano
                 5 - listar livros em um determinado idioma
                 6 - listar top 10 livros mais baixados
+                7 - buscar autor por nome
                 
                 0 - Sair
                 ------------------------------
@@ -63,6 +61,9 @@ public class Principal {
                     break;
                 case 6:
                     listarTop10LivrosMaisBaixado();
+                    break;
+                case 7:
+                    buscarAutorPorNome();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -220,5 +221,20 @@ public class Principal {
 
         System.out.println("Top 10 livros mais baixados:");
         livros.forEach(this::exibirDetalhesLivro);
+    }
+
+    public void buscarAutorPorNome() {
+        System.out.println("Insira o nome do autor que você deseja procurar");
+        var nomeAutor = scanner.nextLine().trim();
+
+        List<Autor> autoresComEsseNome = autorRepository.buscarAutorPorNome(nomeAutor);
+
+        if (autoresComEsseNome.isEmpty()) {
+            System.out.println("Nenhum autor encontrado com esse nome.");
+            return;
+        }
+        // pega somente o primerio autor com aquele nome
+        Autor autor = autoresComEsseNome.getFirst();
+        exibirDetalhesAutor(autor);
     }
 }
